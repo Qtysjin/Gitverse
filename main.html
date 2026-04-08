@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ViT Colab Code Upload</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #2b3a67 0%, #111827 55%);
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .page {
+      width: min(960px, 100%);
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      border-radius: 24px;
+      box-shadow: 0 24px 80px rgba(15, 23, 42, 0.35);
+      overflow: hidden;
+    }
+    header {
+      padding: 32px 36px 20px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+    }
+    header h1 {
+      margin: 0 0 12px;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.05;
+    }
+    header p {
+      margin: 0;
+      max-width: 720px;
+      color: #cbd5e1;
+      font-size: 1rem;
+      line-height: 1.75;
+    }
+    .content {
+      padding: 28px 36px 36px;
+    }
+    .panel {
+      display: grid;
+      gap: 20px;
+    }
+    .upload-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px dashed rgba(148, 163, 184, 0.28);
+      border-radius: 18px;
+      padding: 28px;
+      text-align: center;
+    }
+    .upload-card input[type="file"] {
+      display: none;
+    }
+    .upload-card label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: #2563eb;
+      color: white;
+      padding: 14px 24px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s ease;
+    }
+    .upload-card label:hover {
+      background: #1d4ed8;
+    }
+    .upload-card .hint {
+      margin-top: 14px;
+      color: #94a3b8;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    .files {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      background: rgba(148, 163, 184, 0.08);
+      border-radius: 14px;
+      color: #e2e8f0;
+      font-size: 0.96rem;
+    }
+    .file-item span:last-child {
+      color: #94a3b8;
+      white-space: nowrap;
+    }
+    .notes {
+      background: rgba(148, 163, 184, 0.08);
+      border-radius: 18px;
+      padding: 24px;
+      color: #cbd5e1;
+      line-height: 1.75;
+      border: 1px solid rgba(148, 163, 184, 0.14);
+    }
+    .notes h2 {
+      margin-top: 0;
+      color: #ffffff;
+    }
+    .notes ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+    .notes li {
+      margin-bottom: 10px;
+    }
+    .footer {
+      margin-top: 24px;
+      text-align: center;
+      color: #94a3b8;
+      font-size: 0.95rem;
+    }
+    .secondary {
+      color: #38bdf8;
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <h1>Upload ViT Colab Code</h1>
+      <p>Share your Vision Transformer Colab notebooks, model scripts, or helper utilities in one place. Select one or more files to prepare them for upload, then copy or save the file details.</p>
+    </header>
+    <section class="content">
+      <div class="panel">
+        <div class="upload-card">
+          <label for="codeUpload">Choose ViT Colab files</label>
+          <input type="file" id="codeUpload" multiple accept=".ipynb,.py,.txt,.md" />
+          <div class="hint">Accepted file types: <strong>.ipynb</strong>, <strong>.py</strong>, <strong>.txt</strong>, <strong>.md</strong></div>
+          <div class="files" id="fileList"></div>
+        </div>
+        <div class="notes">
+          <h2>How to use this page</h2>
+          <ul>
+            <li>Select your ViT Colab notebook or supporting code files.</li>
+            <li>Review the selected file names and sizes before uploading.</li>
+            <li>Use a backend or cloud storage service to store the files for sharing.</li>
+          </ul>
+          <p class="secondary">This page is a simple front-end interface. You can integrate it with any file upload endpoint later.</p>
+        </div>
+      </div>
+      <div class="footer">Built for ViT Colab code sharing and quick file preparation.</div>
+    </section>
+  </main>
+  <script>
+    const uploadInput = document.getElementById('codeUpload');
+    const fileList = document.getElementById('fileList');
+
+    function formatBytes(bytes) {
+      if (bytes === 0) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
+    }
+
+    uploadInput.addEventListener('change', () => {
+      fileList.innerHTML = '';
+      const files = Array.from(uploadInput.files);
+      if (files.length === 0) {
+        fileList.innerHTML = '<div class="file-item">No files selected yet.</div>';
+        return;
+      }
+      files.forEach(file => {
+        const item = document.createElement('div');
+        item.className = 'file-item';
+        item.innerHTML = `<span>${file.name}</span><span>${formatBytes(file.size)}</span>`;
+        fileList.appendChild(item);
+      });
+    });
+  </script>
+</body>
+</html>
